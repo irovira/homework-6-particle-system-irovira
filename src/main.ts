@@ -6,6 +6,7 @@ import OpenGLRenderer from './rendering/gl/OpenGLRenderer';
 import Camera from './Camera';
 import {setGL} from './globals';
 import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
+import ParticleSystem from './ParticleSystem';
 
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
@@ -20,27 +21,34 @@ let time: number = 0.0;
 function loadScene() {
   square = new Square();
   square.create();
-
+  //set up Particle System
+  let ps: ParticleSystem = new ParticleSystem(100.0, vec3.fromValues(0,0,0));
+  ps.instantiateVBO();
+  //get offset array of particles from particle system
+  //get color array of particles from particle system
+  //then set instance VBOs of mesh
+  //then set numInstances based on number of particles from particle system
   // Set up particles here. Hard-coded example data for now
-  let offsetsArray = [];
-  let colorsArray = [];
-  let n: number = 100.0;
-  for(let i = 0; i < n; i++) {
-    for(let j = 0; j < n; j++) {
-      offsetsArray.push(i);
-      offsetsArray.push(j);
-      offsetsArray.push(0);
 
-      colorsArray.push(i / n);
-      colorsArray.push(j / n);
-      colorsArray.push(1.0);
-      colorsArray.push(1.0); // Alpha channel
-    }
-  }
-  let offsets: Float32Array = new Float32Array(offsetsArray);
-  let colors: Float32Array = new Float32Array(colorsArray);
-  square.setInstanceVBOs(offsets, colors);
-  square.setNumInstances(n * n); // 10x10 grid of "particles"
+  // let offsetsArray = [];
+  // let colorsArray = [];
+  // let n: number = 1.0;
+  // for(let i = 0; i < n; i++) {
+  //   for(let j = 0; j < n; j++) {
+  //     offsetsArray.push(i);
+  //     offsetsArray.push(j);
+  //     offsetsArray.push(0);
+
+  //     colorsArray.push(i / n);
+  //     colorsArray.push(j / n);
+  //     colorsArray.push(1.0);
+  //     colorsArray.push(1.0); // Alpha channel
+  //   }
+  // }
+  // let offsets: Float32Array = new Float32Array(offsetsArray);
+  // let colors: Float32Array = new Float32Array(colorsArray);
+  square.setInstanceVBOs(ps.offsets, ps.colors);
+  square.setNumInstances(ps.maxParticles * ps.maxParticles); // 10x10 grid of "particles"
 }
 
 function main() {
