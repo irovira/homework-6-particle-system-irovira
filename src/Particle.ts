@@ -58,9 +58,9 @@ class Particle {
 	this.mState[2] = this.pos[2];
 
 	//velocity
-	this.mState[3] = this.vel[0];
-	this.mState[4] = this.vel[1];
-	this.mState[5] = this.vel[2];
+	this.mState[3] = 0.0;
+	this.mState[4] = 0.0;
+	this.mState[5] = 0.0;
 
 	//acceleration, which is zero for now
 	this.mState[6] = 0.0;
@@ -86,14 +86,20 @@ class Particle {
 	this.mStateDot[0] = this.mState[3];
 	this.mStateDot[1] = this.mState[4];
 	this.mStateDot[2] = this.mState[5];
+	
 	//acceleration
 	this.mStateDot[3] = this.mState[6] / this.mState[9];
 	this.mStateDot[4] = this.mState[7] / this.mState[9];
 	this.mStateDot[5] = this.mState[8] / this.mState[9];
 	//forces
-	this.mStateDot[6] = 0.0;
-	this.mStateDot[7] = 0.0;
-	this.mStateDot[8] = 0.0;
+
+	// var force = vec3.create();
+	// vec3.subtract(force, this.pos, vec3.fromValues(0,0,0));
+	// vec3.normalize(force,force);
+	
+	this.mState[6] = Math.cos(deltaT) / 1000000.0;//1.0;
+	this.mState[7] = Math.sin(deltaT) / 1000000.0;
+	this.mState[8] = 0.0;
 	//mass
 	this.mStateDot[9] = 1.0;
 	//time to live
@@ -103,13 +109,24 @@ class Particle {
 	this.computeDynamics(deltaT);
 	//euler integration
 	//update position
+	//debugger;
+	//add velocity to position
 	this.mState[0] = this.mState[0] + this.mStateDot[0] * deltaT;
 	this.mState[1] = this.mState[1] + this.mStateDot[1] * deltaT;
 	this.mState[2] = this.mState[2] + this.mStateDot[2] * deltaT;
+	//add acceleration to velocity
 	this.mState[3] = this.mState[3] + this.mStateDot[3] * deltaT;
 	this.mState[4] = this.mState[4] + this.mStateDot[4] * deltaT;
 	this.mState[5] = this.mState[5] + this.mStateDot[5] * deltaT;
 	//TODO: update time to live
+
+	this.pos[0] = this.mState[0];
+	this.pos[1] = this.mState[1];
+	this.pos[2] = this.mState[2];//(Math.sin((deltaT + this.mState[0]) * 3.14159 * 0.1) + Math.cos((deltaT + this.mState[1]) * 3.14159 * 0.1)) * 1.5;
+
+	this.vel[0] = this.mState[3];
+	this.vel[1] = this.mState[4];
+	this.vel[2] = this.mState[5];
   }
 
   update() {

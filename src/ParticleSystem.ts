@@ -58,47 +58,18 @@ class ParticleSystem {
     this.offsets = new Float32Array(offsetsArray);
     this.colors =  new Float32Array(colorsArray);
 
-    // let offsetsArray = [];
-    // let colorsArray = [];
-    // for(let i = 0; i < this.maxParticles; i++){
-    //     for(let j = 0; j < this.maxParticles; j++){
-    //         offsetsArray.push(i);
-    //         offsetsArray.push(j);
-    //         offsetsArray.push(0);
-  
-    //         colorsArray.push(i / this.maxParticles);
-    //         colorsArray.push(j / this.maxParticles);
-    //         colorsArray.push(1.0);
-    //         colorsArray.push(1.0); // Alpha channel
-    //     }
-    // }
-
-    // this.offsets = new Float32Array(offsetsArray);
-    // this.colors =  new Float32Array(colorsArray);
-    // let offsetsArray = [];
-    // let colorsArray = [];
-    // let n: number = 1.0;
-    // for(let i = 0; i < n; i++) {
-    //   for(let j = 0; j < n; j++) {
-    //     offsetsArray.push(i);
-    //     offsetsArray.push(j);
-    //     offsetsArray.push(0);
-  
-    //     colorsArray.push(i / n);
-    //     colorsArray.push(j / n);
-    //     colorsArray.push(1.0);
-    //     colorsArray.push(1.0); // Alpha channel
-    //   }
-    // }
-    // let offsets: Float32Array = new Float32Array(offsetsArray);
-    // let colors: Float32Array = new Float32Array(colorsArray);
   }
 
   updateState(deltaT:number){
     //update every particle in the list
+    //debugger;
     for(var i = 0; i < this.particles.length; i++){
+      //console.log(this.particles[i].pos);
       this.particles[i].updateState(deltaT);
+      //console.log(this.particles[i].pos);
     }
+    //debugger;
+    this.instantiateVBO();
   }
 
   update() {

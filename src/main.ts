@@ -17,12 +17,12 @@ const controls = {
 
 let square: Square;
 let time: number = 0.0;
-
+let ps: ParticleSystem = new ParticleSystem(10.0, vec3.fromValues(0,0,0));
 function loadScene() {
   square = new Square();
   square.create();
   //set up Particle System
-  let ps: ParticleSystem = new ParticleSystem(100.0, vec3.fromValues(0,0,0));
+  
   ps.instantiateVBO();
   //get offset array of particles from particle system
   //get color array of particles from particle system
@@ -93,6 +93,8 @@ function main() {
     camera.update();
     stats.begin();
     lambert.setTime(time++);
+    ps.updateState(time);
+    square.setInstanceVBOs(ps.offsets, ps.colors);
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
     renderer.clear();
     renderer.render(camera, lambert, [
