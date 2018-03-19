@@ -93,13 +93,13 @@ class Particle {
 	this.mStateDot[5] = this.mState[8] / this.mState[9];
 	//forces
 
-	// var force = vec3.create();
-	// vec3.subtract(force, this.pos, vec3.fromValues(0,0,0));
-	// vec3.normalize(force,force);
+	var force = vec3.create();
+	vec3.subtract(force, this.pos, vec3.fromValues(0,0,0));
+	vec3.normalize(force,force);
 	
-	this.mState[6] = Math.cos(deltaT) / 1000000.0;//1.0;
-	this.mState[7] = Math.sin(deltaT) / 1000000.0;
-	this.mState[8] = 0.0;
+	this.mState[6] = 0.0;//force[0];//Math.cos(deltaT) / 10000000.0;//1.0;
+	this.mState[7] = 0.0;//force[1];//Math.sin(deltaT) / 10000000.0;
+	this.mState[8] = 0.0;//force[2];//0.0;
 	//mass
 	this.mStateDot[9] = 1.0;
 	//time to live

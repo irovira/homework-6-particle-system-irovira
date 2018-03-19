@@ -9,6 +9,12 @@ class ParticleSystem {
   offsets: Float32Array;
   colors: Float32Array;
 
+  //palette controls
+  color1: Array<number>;
+  color2: Array<number>;
+  color3: Array<number>;
+  greyControl: number;
+
   //velocity = mState[0,1,2];
   //acceleration = mState[3,4,5];
   //forces = mState[6,7,8];
@@ -16,10 +22,56 @@ class ParticleSystem {
   //time to live = mState[10];
 
 
-  constructor(numParticles:number, rootPos:vec3) {
+  constructor(numParticles:number, color1:Array<number>, color2:Array<number>, color3:Array<number>, greyControl:number, rootPos:vec3) {
     this.maxParticles = numParticles;
+
+    this.color1 = color1;
+    this.color2 = color2;
+    this.color3 = color3;
+    this.greyControl = greyControl;
+
     this.createParticles(rootPos);
   }
+
+  updateColor(color1:Array<number>, color2:Array<number>, color3:Array<number>, greyControl:number) {
+    
+    this.color1 = color1;
+    this.color2 = color2;
+    this.color3 = color3;
+    this.greyControl = greyControl;
+
+
+    //update colors of particles
+    for(let i = 0; i < this.particles.length; i++){
+      let p: Particle = this.particles[i];
+      p.col = this.generateColor();
+    }
+
+  }
+ //palette generation based on triad mixing from 
+ //http://devmag.org.za/2012/07/29/how-to-choose-colours-procedurally-algorithms/
+
+ generateColor() : vec4 {
+  var randomIndex = Math.floor(Math.random() * 3);
+
+  var mixRatio1 = (randomIndex == 0) ? Math.random() * this.greyControl : Math.random();
+  var mixRatio2 = (randomIndex == 1) ? Math.random() * this.greyControl : Math.random();
+  var mixRatio3 = (randomIndex == 2) ? Math.random() * this.greyControl : Math.random();
+
+  var sum = mixRatio1 + mixRatio2 + mixRatio3;
+
+  mixRatio1 /= sum;
+  mixRatio2 /= sum;
+  mixRatio3 /= sum;
+
+  var r = (mixRatio1 * this.color1[0]+ mixRatio2 * this.color2[0]+ mixRatio3 * this.color3[0]) / 255.0;
+  var g = (mixRatio1 * this.color1[1]+ mixRatio2 * this.color2[1]+ mixRatio3 * this.color3[1]) / 255.0;
+  var b = (mixRatio1 * this.color1[2]+ mixRatio2 * this.color2[2]+ mixRatio3 * this.color3[2]) / 255.0;
+
+  var color = vec4.fromValues(r,g,b,1.0);
+
+  return color;
+ }
   
   createParticles(rootPos:vec3){
 
@@ -30,7 +82,7 @@ class ParticleSystem {
 
             var vel = vec3.fromValues(0,0,0);
   
-            var col = vec4.fromValues(i / this.maxParticles,j / this.maxParticles,1.0,1.0);
+            var col = this.generateColor();//vec4.fromValues(i / this.maxParticles,j / this.maxParticles,1.0,1.0);
 
             let p : Particle = new Particle(pos, vel, col);
 

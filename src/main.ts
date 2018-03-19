@@ -13,11 +13,16 @@ import ParticleSystem from './ParticleSystem';
 const controls = {
   tesselations: 5,
   'Load Scene': loadScene, // A function pointer, essentially
+  color1: [ 255, 0, 0 ],
+  color2: [ 0, 255, 0 ],
+  color3: [ 0, 0, 255 ],
+  greyControl: 0.0,
 };
+
 
 let square: Square;
 let time: number = 0.0;
-let ps: ParticleSystem = new ParticleSystem(10.0, vec3.fromValues(0,0,0));
+let ps: ParticleSystem = new ParticleSystem(100.0, controls.color1, controls.color2, controls.color3, controls.greyControl, vec3.fromValues(0,0,0));
 function loadScene() {
   square = new Square();
   square.create();
@@ -62,6 +67,29 @@ function main() {
 
   // Add controls to the gui
   const gui = new DAT.GUI();
+  var color1 = gui.addColor(controls, 'color1');
+  var color2 = gui.addColor(controls, 'color2');
+  var color3 = gui.addColor(controls, 'color3');
+  var greyControl = gui.add(controls, 'greyControl', 0, 1);
+
+  
+  color1.onFinishChange(function() {
+    // Fires on every change, drag, keypress, etc.
+    ps.updateColor(controls.color1,controls.color2,controls.color3,controls.greyControl);
+  });
+  color2.onFinishChange(function() {
+    // Fires on every change, drag, keypress, etc.
+    ps.updateColor(controls.color1,controls.color2,controls.color3,controls.greyControl);
+  });
+  color3.onFinishChange(function() {
+    // Fires on every change, drag, keypress, etc.
+    ps.updateColor(controls.color1,controls.color2,controls.color3,controls.greyControl);
+  });
+  greyControl.onFinishChange(function() {
+    // Fires on every change, drag, keypress, etc.
+    ps.updateColor(controls.color1,controls.color2,controls.color3,controls.greyControl);
+  });
+
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
