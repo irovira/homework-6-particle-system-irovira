@@ -59,9 +59,9 @@ class Particle {
 	this.mState[2] = this.pos[2];
 
 	//velocity
-	this.mState[3] = Math.random();
-	this.mState[4] = Math.random();
-	this.mState[5] = Math.random();
+	this.mState[3] = 0.0;//Math.random();
+	this.mState[4] = 0.0;//Math.random();
+	this.mState[5] = 0.0;//Math.random();
 
 	//acceleration, which is zero for now
 	this.mState[6] = 0.0;
@@ -98,13 +98,13 @@ class Particle {
 	this.mStateDot[5] = this.mState[8] / this.mState[9];
 	//forces
 
-	var force = vec3.create();
-	vec3.subtract(force, this.pos, vec3.fromValues(0,0,0));
+	//var force = vec3.create();
+	//vec3.subtract(force, this.pos, vec3.fromValues(0,0,0));
 	//vec3.normalize(force,force);
 	var jitter = Math.random();
-	this.mState[6] = jitter * -force[0] - this.addedForce[0];//0.0;//Math.random();//0.0;//force[0];//Math.cos(deltaT) / 10000000.0;//1.0;
-	this.mState[7] = jitter * -force[1] - this.addedForce[1];//0.0;//Math.random();//0.0;//force[1];//Math.sin(deltaT) / 10000000.0;
-	this.mState[8] = jitter * -force[2] - this.addedForce[2];//0.0;//Math.random();//0.0;//force[2];//0.0;
+	this.mState[6] = this.addedForce[0];//jitter * -force[0] - this.addedForce[0];//0.0;//Math.random();//0.0;//force[0];//Math.cos(deltaT) / 10000000.0;//1.0;
+	this.mState[7] = this.addedForce[1];//jitter * -force[1] - this.addedForce[1];//0.0;//Math.random();//0.0;//force[1];//Math.sin(deltaT) / 10000000.0;
+	this.mState[8] = this.addedForce[2];//jitter * -force[2] - this.addedForce[2];//0.0;//Math.random();//0.0;//force[2];//0.0;
 	if(this.addedForce[0] > 0.5){
 		this.addedForce[0] -= 5.0
 	} else {
@@ -126,15 +126,19 @@ class Particle {
 	this.mStateDot[10] = 1.0;
   }
 
-  updateForce(f:vec3){
+  updateForce(position:vec3){
 	var force = vec3.create();
-	debugger;
+	//debugger;
 	//console.log('was ' + this.addedForce);
-	vec3.subtract(force, vec3.fromValues(0,0,0), this.pos);
-	this.addedForce[0] += force[0] * 10.0;
-	this.addedForce[1] += force[1] * 10.0;
-	this.addedForce[2] += force[2] * 10.0;
-	//console.log('is now ' + this.addedForce);
+	//debugger;
+	vec3.subtract(force, this.pos, position);
+	var r = vec3.length(force);
+	r *= r;
+	vec3.scale(force,force, 1/r);
+	this.addedForce[0] += 50.0*force[0];//500.0 - force[0];
+	this.addedForce[1] += 50.0*force[1];//500.0 - force[1];
+	this.addedForce[2] += 50.0*force[2];//500.0 - force[2];
+	console.log('is now ' + this.addedForce);
 	
   }
   updateState(deltaT:number){

@@ -1,4 +1,4 @@
-import {vec3,mat4} from 'gl-matrix';
+import {vec3,vec4, mat4} from 'gl-matrix';
 import * as Stats from 'stats-js';
 import * as DAT from 'dat-gui';
 import Square from './geometry/Square';
@@ -110,12 +110,53 @@ function main() {
     var mousePositionX = (2*event.clientX/canvas.width) - 1;
     var mousePositionY = (2*event.clientY/(canvas.height*(-1))) + 1;
     //cast ray into scene and create an attractor or repeller
-    // var invViewProjMat = mat4.create();
-    // mat4.multiply(invViewProjMat, camera.viewMatrix, camera.projectionMatrix);
-    // mat4.invert(invViewProjMat,invViewProjMat);
-    // console.log(mousePositionX);
+    var invViewProjMat = mat4.create();
+    mat4.multiply(invViewProjMat, camera.viewMatrix, camera.projectionMatrix);
+    mat4.invert(invViewProjMat,invViewProjMat);
+    //construct mouse position
+    var arr = new Array<number>();
+    var winZ = 1.0;
 
-    ps.addForce();
+
+    arr[0]=(2.0* event.clientX/canvas.width)-1.0;
+    arr[1]=1.0-(2.0*(event.clientY/canvas.height));
+    arr[2]=2.0* winZ -1.0;
+    arr[3]=1.0;  
+    
+    var ref = vec3.create();
+    vec3.scale(ref,camera.forward,200.0);
+    vec3.add(ref,ref,camera.position);
+    var lengthV = vec3.create();
+    var length = vec3.length(vec3.subtract(lengthV, ref, camera.position));
+    var alpha = camera.fovy / 2.0;
+
+    var V = vec3.create();
+    vec3.scale(V, camera.up, length * Math.tan(alpha));
+
+    var H = vec3.create();
+    vec3.scale(H, camera.right, length * Math.tan(alpha) * camera.aspectRatio);
+    
+    var finalPos = vec3.create();
+
+    var sXH = vec3.create();
+    vec3.scale(sXH, H, arr[0]); //sx*H
+
+    var sYV = vec3.create();
+    vec3.scale(sYV, V, arr[1]); //sy*V
+
+    vec3.add(finalPos, vec3.add(finalPos, ref, sXH), sYV);
+    // var vIn = vec4.fromValues(arr[0],arr[1],arr[2],arr[3]);
+    // var pos = vec4.create();
+    // pos = vec4.transformMat4(pos, vIn, invViewProjMat);
+
+    // pos[3] = 1.0 / pos[3];
+
+    // pos[0] *= pos[3];
+    // pos[1] *= pos[3];
+    // pos[2] *= pos[3];
+    // // console.log(mousePositionX);
+    // var finalPos = vec3.fromValues(pos[0],pos[1],pos[2]);
+    ps.addForce(finalPos);
 
 
   }
@@ -140,7 +181,7 @@ function main() {
     camera.update();
     stats.begin();
     lambert.setTime(time++);
-    ps.updateState(time * 0.00001);
+    ps.updateState(time * 0.01);
     square.setInstanceVBOs(ps.offsets, ps.colors);
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
     renderer.clear();

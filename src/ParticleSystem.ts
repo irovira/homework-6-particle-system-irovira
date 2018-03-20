@@ -114,10 +114,11 @@ class ParticleSystem {
 
   }
 
-  addForce(){
+  addForce(pos:vec3){
+    console.log(pos);
     for(var i = 0; i < this.particles.length; i++){
       //console.log(this.particles[i].pos);
-      this.particles[i].updateForce(vec3.create());
+      this.particles[i].updateForce(pos);
       //console.log(this.particles[i].pos);
     }
   }
@@ -125,6 +126,7 @@ class ParticleSystem {
   updateState(deltaT:number){
     //update every particle in the list
     //debugger;
+    
     for(var i = 0; i < this.particles.length; i++){
       //console.log(this.particles[i].pos);
       this.particles[i].updateState(deltaT);
