@@ -74,11 +74,13 @@ class ParticleSystem {
  }
   
   createParticles(rootPos:vec3){
-
+    var dim = this.maxParticles / 2;
     for(let i = 0; i < this.maxParticles; i++){
         for(let j = 0; j < this.maxParticles; j++){
-
-            var pos = vec3.fromValues(i,j,0);
+            var x = Math.floor(Math.random() * (i+1));
+            var y = Math.floor(Math.random() * (j+1));
+            var z = Math.floor(Math.random() * (this.maxParticles));
+            var pos = vec3.fromValues(x - dim,y - dim,z - dim);
 
             var vel = vec3.fromValues(0,0,0);
   
@@ -110,6 +112,14 @@ class ParticleSystem {
     this.offsets = new Float32Array(offsetsArray);
     this.colors =  new Float32Array(colorsArray);
 
+  }
+
+  addForce(){
+    for(var i = 0; i < this.particles.length; i++){
+      //console.log(this.particles[i].pos);
+      this.particles[i].updateForce(vec3.create());
+      //console.log(this.particles[i].pos);
+    }
   }
 
   updateState(deltaT:number){

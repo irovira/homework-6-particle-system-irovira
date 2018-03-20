@@ -1,4 +1,4 @@
-import {vec3} from 'gl-matrix';
+import {vec3,mat4} from 'gl-matrix';
 import * as Stats from 'stats-js';
 import * as DAT from 'dat-gui';
 import Square from './geometry/Square';
@@ -56,6 +56,8 @@ function loadScene() {
   square.setNumInstances(ps.maxParticles * ps.maxParticles); // 10x10 grid of "particles"
 }
 
+const camera = new Camera(vec3.fromValues(50, 50, 10), vec3.fromValues(50, 50, 0));
+
 function main() {
   // Initial display for framerate
   const stats = Stats();
@@ -101,10 +103,27 @@ function main() {
   // Later, we can import `gl` from `globals.ts` to access it
   setGL(gl);
 
+  //TODO: MOUSE POSITION
+  canvas.addEventListener("dblclick", getClick, false);
+  function getClick(event: MouseEvent){
+
+    var mousePositionX = (2*event.clientX/canvas.width) - 1;
+    var mousePositionY = (2*event.clientY/(canvas.height*(-1))) + 1;
+    //cast ray into scene and create an attractor or repeller
+    // var invViewProjMat = mat4.create();
+    // mat4.multiply(invViewProjMat, camera.viewMatrix, camera.projectionMatrix);
+    // mat4.invert(invViewProjMat,invViewProjMat);
+    // console.log(mousePositionX);
+
+    ps.addForce();
+
+
+  }
+
   // Initial call to load scene
   loadScene();
 
-  const camera = new Camera(vec3.fromValues(50, 50, 10), vec3.fromValues(50, 50, 0));
+  
 
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor(0.2, 0.2, 0.2, 1);
@@ -121,7 +140,7 @@ function main() {
     camera.update();
     stats.begin();
     lambert.setTime(time++);
-    ps.updateState(time);
+    ps.updateState(time * 0.00001);
     square.setInstanceVBOs(ps.offsets, ps.colors);
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
     renderer.clear();

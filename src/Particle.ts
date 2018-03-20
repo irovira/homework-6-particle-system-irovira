@@ -5,6 +5,7 @@ class Particle {
   pos: vec3 = vec3.create();
   vel: vec3 = vec3.create();
   col: vec4 = vec4.create();
+  addedForce: vec3 = vec3.create();
   mState: Array<number> = new Array<number>();
   mStateDot: Array<number> = new Array<number>();
 
@@ -58,16 +59,16 @@ class Particle {
 	this.mState[2] = this.pos[2];
 
 	//velocity
-	this.mState[3] = 0.0;
-	this.mState[4] = 0.0;
-	this.mState[5] = 0.0;
+	this.mState[3] = Math.random();
+	this.mState[4] = Math.random();
+	this.mState[5] = Math.random();
 
 	//acceleration, which is zero for now
 	this.mState[6] = 0.0;
 	this.mState[7] = 0.0;
 	this.mState[8] = 0.0;
 
-	this.mState[9] = 1.0; //mass is 1 for now
+	this.mState[9] = 10.0; //mass is 1 for now
 	this.mState[10] = 1.0; //lifespan is 1 for now
 
 	//velocity, mStateDot
@@ -83,6 +84,10 @@ class Particle {
   computeDynamics(deltaT:number){
 	//TODO: Add your code here
 	//velocity
+	// this.mState[3] = Math.cos(deltaT);
+	// this.mState[4] = Math.sin(deltaT);
+	// this.mState[5] = 0.0;
+	//velocity
 	this.mStateDot[0] = this.mState[3];
 	this.mStateDot[1] = this.mState[4];
 	this.mStateDot[2] = this.mState[5];
@@ -95,15 +100,42 @@ class Particle {
 
 	var force = vec3.create();
 	vec3.subtract(force, this.pos, vec3.fromValues(0,0,0));
-	vec3.normalize(force,force);
-	
-	this.mState[6] = 0.0;//force[0];//Math.cos(deltaT) / 10000000.0;//1.0;
-	this.mState[7] = 0.0;//force[1];//Math.sin(deltaT) / 10000000.0;
-	this.mState[8] = 0.0;//force[2];//0.0;
+	//vec3.normalize(force,force);
+	var jitter = Math.random();
+	this.mState[6] = jitter * -force[0] - this.addedForce[0];//0.0;//Math.random();//0.0;//force[0];//Math.cos(deltaT) / 10000000.0;//1.0;
+	this.mState[7] = jitter * -force[1] - this.addedForce[1];//0.0;//Math.random();//0.0;//force[1];//Math.sin(deltaT) / 10000000.0;
+	this.mState[8] = jitter * -force[2] - this.addedForce[2];//0.0;//Math.random();//0.0;//force[2];//0.0;
+	if(this.addedForce[0] > 0.5){
+		this.addedForce[0] -= 5.0
+	} else {
+		this.addedForce[0] = 0.0;
+	}
+	if(this.addedForce[1] > 0.5){
+		this.addedForce[1] -= 5.0
+	} else {
+		this.addedForce[1] = 0.0;
+	}
+	if(this.addedForce[2] > 0.5){
+		this.addedForce[2] -= 5.0
+	} else {
+		this.addedForce[2] = 0.0;
+	}
 	//mass
-	this.mStateDot[9] = 1.0;
+	this.mStateDot[9] = 10.0;
 	//time to live
 	this.mStateDot[10] = 1.0;
+  }
+
+  updateForce(f:vec3){
+	var force = vec3.create();
+	debugger;
+	//console.log('was ' + this.addedForce);
+	vec3.subtract(force, vec3.fromValues(0,0,0), this.pos);
+	this.addedForce[0] += force[0] * 10.0;
+	this.addedForce[1] += force[1] * 10.0;
+	this.addedForce[2] += force[2] * 10.0;
+	//console.log('is now ' + this.addedForce);
+	
   }
   updateState(deltaT:number){
 	this.computeDynamics(deltaT);
