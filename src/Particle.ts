@@ -88,10 +88,11 @@ class Particle {
 	// } else if (r < this.restoreRadius - 4.0){
 	// 	return vec3.scale(force, force,0.1);
 	// }
-	if(weh > 0.2 && r > this.restoreRadius){
+	if(weh > 0.7 || r > 1.0){
 		return vec3.scale(force, force,-0.2);
 		
 	} else {
+		this.vel = vec3.fromValues(force[0] * 0.001,force[1] * 0.001,force[2] * 0.001);
 		return vec3.scale(force, force,0.2);
 	}
 	//vec3.scale(force, force,-0.001);

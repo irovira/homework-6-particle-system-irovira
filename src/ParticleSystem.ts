@@ -98,30 +98,17 @@ class ParticleSystem {
   }
 
   attractMesh(positions:Float32Array){
+    console.log('current mesh size is' + positions.length);
     for(var i = 0; i < this.particles.length; i++){
       //console.log(this.particles[i].pos);
-      var p = Math.floor(Math.random() * 4) * 3;
-      this.particles[i].pos =  vec3.fromValues(positions[p],positions[p+1], positions[p+2]);
+      var p = Math.floor(Math.random() * (positions.length / 3)) * 3;
+      //this.particles[i].pos =  vec3.fromValues(positions[p],positions[p+1], positions[p+2]);
+      //console.log(this.particles[i].pos );
       //console.log(this.particles[i].pos);
       this.particles[i].center =  vec3.fromValues(positions[p],positions[p+1], positions[p+2]);
       this.particles[i].vel = vec3.fromValues(0,0,0);
       //console.log(this.particles[i].pos);
     }
-    // var offset = 0;
-    // var verts = positions.length / 3;
-    // for(var j = 0; j < positions.length; j = j + 3){
-    //   offset = (this.particles.length / verts) * j;
-    //   for(var i = 0; i < this.particles.length / verts; i++){
-    //     //console.log(this.particles[i].pos);
-    //     this.particles[i+offset].pos =  vec3.fromValues(positions[j],positions[j+1], positions[j+2]);
-    //     this.particles[i+offset].center =  vec3.fromValues(positions[j],positions[j+1], positions[j+2]);
-        
-    //     //console.log('called');
-    //     this.particles[i+offset].vel = vec3.fromValues(0,0,0);
-    //     //console.log(this.particles[i].pos);
-    //   }
-      
-    // }
     
   }
 

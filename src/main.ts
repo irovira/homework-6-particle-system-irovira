@@ -9,7 +9,8 @@ import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 import ParticleSystem from './ParticleSystem';
 //import * as fs from 'fs';
 
-
+var THREE = require('three');
+var THREEJS = require("three-js")(["OBJLoader"]);
 // var OBJ = require('webgl-obj-loader');
 import Bunny from './geometry/Bunny';
 
@@ -24,13 +25,14 @@ const controls = {
   greyControl: 0.0,
   'Restore Center' : restoreCenter,
   mode: 'attract',
-  'Add Mesh' : attractMesh,
+  'Wahoo!' : chooseMario,
+  'Bunny' : chooseBunny,
 };
 
 
 let square: Square;
 let time: number = 0.0;
-let ps: ParticleSystem = new ParticleSystem(100.0, controls.color1, controls.color2, controls.color3, controls.greyControl, vec3.fromValues(0,0,0));
+let ps: ParticleSystem = new ParticleSystem(200.0, controls.color1, controls.color2, controls.color3, controls.greyControl, vec3.fromValues(0,0,0));
 var bunny: Bunny = new Bunny();
 function restoreCenter(){
   ps.restore();
@@ -45,11 +47,80 @@ function loadScene() {
   ps.instantiateVBO();
   square.setInstanceVBOs(ps.offsets, ps.colors);
   square.setNumInstances(ps.maxParticles * ps.maxParticles); // 10x10 grid of "particles"
+  var objLoader = new THREEJS.OBJLoader();
+  objLoader.setPath('/obj/');
+  var tempPos = new Array<vec3>();
+  var mario = objLoader.load('wahoo.obj', function (object:any) {
+      
+    
+      // });
+
+      // object.scale(10,10,10);
+      // tempPos = new Float32Array(object.vertices);//new Float32Array(object.vertices);
+      //console.log('obj loaded!');
+      //object.scale(10,10,10);
+      object.traverse( function ( child:any ) {
+
+        if ( child.geometry != undefined ) {
+          var g = new THREE.Geometry().fromBufferGeometry( child.geometry );
+          //console.log('inside geoemtry');
+          //console.log( geometry.vertices );
+          //console.log(geometry.vertices.length);
+          //tempPos = geometry.vertices;
+          //console.log(child.geometry.attributes.position.array);
+          //console.log(child.geometry.attributes.position.array);
+          var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+          var mesh = new THREE.Mesh(g, material);
+         // mesh.scale.set(100, 100, 100);
+          var bufferGeometry = new THREE.BufferGeometry().fromGeometry( mesh.geometry );
+          bufferGeometry.scale(50,50,50);
+          //console.log(bufferGeometry.attributes.position.array);
+          
+          
+          bunny.loadMario(new Float32Array(bufferGeometry.attributes.position.array));
+      }});
+      
+     });
+     var bunnyMesh = objLoader.load('bunny.obj', function (object:any) {
+      //console.log('obj loaded!');
+      //object.scale(10,10,10);
+      object.traverse( function ( child:any ) {
+
+        if ( child.geometry != undefined ) {
+          var g = new THREE.Geometry().fromBufferGeometry( child.geometry );
+          //console.log('inside geoemtry');
+          //console.log( geometry.vertices );
+          //console.log(geometry.vertices.length);
+          //tempPos = geometry.vertices;
+          //console.log(child.geometry.attributes.position.array);
+          //console.log(child.geometry.attributes.position.array);
+          var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+          var mesh = new THREE.Mesh(g, material);
+          //mesh.scale.set(100, 100, 100);
+          var bufferGeometry = new THREE.BufferGeometry().fromGeometry( mesh.geometry );
+          bufferGeometry.scale(1000,1000,1000);
+          
+          
+          bunny.loadBunny(new Float32Array(bufferGeometry.attributes.position.array));
+      }});
+      
+     });
+  //bunny.loadMesh();
 }
 
 function attractMesh(){
   ps.attractMesh(bunny.positions);
 }
+function chooseMario(){
+  bunny.positions = bunny.mario;
+  attractMesh();
+}
+
+function chooseBunny(){
+  bunny.positions = bunny.bunny;
+  attractMesh();
+}
+
 const camera = new Camera(vec3.fromValues(50, 50, 10), vec3.fromValues(50, 50, 0));
 
 function main() {
@@ -68,7 +139,8 @@ function main() {
   var color3 = gui.addColor(controls, 'color3');
   var greyControl = gui.add(controls, 'greyControl', 0, 1);
   gui.add(controls, 'Restore Center');
-  gui.add(controls, 'Add Mesh');
+  gui.add(controls, 'Bunny');
+  gui.add(controls, 'Wahoo!');
   gui.add(controls, 'mode', [ 'attract', 'repel'] );
 
   
