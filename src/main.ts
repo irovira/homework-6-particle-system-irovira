@@ -17,12 +17,16 @@ const controls = {
   color2: [ 0, 255, 0 ],
   color3: [ 0, 0, 255 ],
   greyControl: 0.0,
+  'Restore Center' : restoreCenter,
 };
 
 
 let square: Square;
 let time: number = 0.0;
 let ps: ParticleSystem = new ParticleSystem(100.0, controls.color1, controls.color2, controls.color3, controls.greyControl, vec3.fromValues(0,0,0));
+function restoreCenter(){
+  ps.restore();
+}
 function loadScene() {
   square = new Square();
   square.create();
@@ -73,6 +77,7 @@ function main() {
   var color2 = gui.addColor(controls, 'color2');
   var color3 = gui.addColor(controls, 'color3');
   var greyControl = gui.add(controls, 'greyControl', 0, 1);
+  gui.add(controls, 'Restore Center');
 
   
   color1.onFinishChange(function() {
@@ -124,7 +129,7 @@ function main() {
     arr[3]=1.0;  
     
     var ref = vec3.create();
-    vec3.scale(ref,camera.forward,200.0);
+    vec3.scale(ref,camera.forward,125.0);
     vec3.add(ref,ref,camera.position);
     var lengthV = vec3.create();
     var length = vec3.length(vec3.subtract(lengthV, ref, camera.position));

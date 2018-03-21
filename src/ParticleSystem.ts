@@ -31,6 +31,7 @@ class ParticleSystem {
     this.greyControl = greyControl;
 
     this.createParticles(rootPos);
+    this.pos = rootPos;
   }
 
   updateColor(color1:Array<number>, color2:Array<number>, color3:Array<number>, greyControl:number) {
@@ -77,10 +78,12 @@ class ParticleSystem {
     var dim = this.maxParticles / 2;
     for(let i = 0; i < this.maxParticles; i++){
         for(let j = 0; j < this.maxParticles; j++){
-            var x = Math.floor(Math.random() * (i+1));
-            var y = Math.floor(Math.random() * (j+1));
+            var x = Math.floor(Math.random() * (this.maxParticles));
+            var y = Math.floor(Math.random() * (this.maxParticles));
             var z = Math.floor(Math.random() * (this.maxParticles));
             var pos = vec3.fromValues(x - dim,y - dim,z - dim);
+
+            // var pos = vec3.fromValues(i,j,0);
 
             var vel = vec3.fromValues(0,0,0);
   
@@ -90,6 +93,17 @@ class ParticleSystem {
 
             this.particles.push(p);
         }
+    }
+
+  }
+
+  restore(){
+    //pushes back particles
+    //console.log(pos);
+    for(var i = 0; i < this.particles.length; i++){
+      //console.log(this.particles[i].pos);
+      this.particles[i].restore(this.pos);
+      //console.log(this.particles[i].pos);
     }
 
   }
