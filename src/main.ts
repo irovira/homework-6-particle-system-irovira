@@ -7,6 +7,11 @@ import Camera from './Camera';
 import {setGL} from './globals';
 import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 import ParticleSystem from './ParticleSystem';
+//import * as fs from 'fs';
+
+
+// var OBJ = require('webgl-obj-loader');
+import Bunny from './geometry/Bunny';
 
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
@@ -18,48 +23,33 @@ const controls = {
   color3: [ 0, 0, 255 ],
   greyControl: 0.0,
   'Restore Center' : restoreCenter,
+  mode: 'attract',
+  'Add Mesh' : attractMesh,
 };
 
 
 let square: Square;
 let time: number = 0.0;
 let ps: ParticleSystem = new ParticleSystem(100.0, controls.color1, controls.color2, controls.color3, controls.greyControl, vec3.fromValues(0,0,0));
+var bunny: Bunny = new Bunny();
 function restoreCenter(){
   ps.restore();
 }
+
+
 function loadScene() {
   square = new Square();
   square.create();
   //set up Particle System
-  
+  //bunny = new Bunny();
   ps.instantiateVBO();
-  //get offset array of particles from particle system
-  //get color array of particles from particle system
-  //then set instance VBOs of mesh
-  //then set numInstances based on number of particles from particle system
-  // Set up particles here. Hard-coded example data for now
-
-  // let offsetsArray = [];
-  // let colorsArray = [];
-  // let n: number = 1.0;
-  // for(let i = 0; i < n; i++) {
-  //   for(let j = 0; j < n; j++) {
-  //     offsetsArray.push(i);
-  //     offsetsArray.push(j);
-  //     offsetsArray.push(0);
-
-  //     colorsArray.push(i / n);
-  //     colorsArray.push(j / n);
-  //     colorsArray.push(1.0);
-  //     colorsArray.push(1.0); // Alpha channel
-  //   }
-  // }
-  // let offsets: Float32Array = new Float32Array(offsetsArray);
-  // let colors: Float32Array = new Float32Array(colorsArray);
   square.setInstanceVBOs(ps.offsets, ps.colors);
   square.setNumInstances(ps.maxParticles * ps.maxParticles); // 10x10 grid of "particles"
 }
 
+function attractMesh(){
+  ps.attractMesh(bunny.positions);
+}
 const camera = new Camera(vec3.fromValues(50, 50, 10), vec3.fromValues(50, 50, 0));
 
 function main() {
@@ -78,6 +68,8 @@ function main() {
   var color3 = gui.addColor(controls, 'color3');
   var greyControl = gui.add(controls, 'greyControl', 0, 1);
   gui.add(controls, 'Restore Center');
+  gui.add(controls, 'Add Mesh');
+  gui.add(controls, 'mode', [ 'attract', 'repel'] );
 
   
   color1.onFinishChange(function() {
@@ -129,7 +121,7 @@ function main() {
     arr[3]=1.0;  
     
     var ref = vec3.create();
-    vec3.scale(ref,camera.forward,125.0);
+    vec3.scale(ref,camera.forward,175.0);
     vec3.add(ref,ref,camera.position);
     var lengthV = vec3.create();
     var length = vec3.length(vec3.subtract(lengthV, ref, camera.position));
@@ -150,18 +142,13 @@ function main() {
     vec3.scale(sYV, V, arr[1]); //sy*V
 
     vec3.add(finalPos, vec3.add(finalPos, ref, sXH), sYV);
-    // var vIn = vec4.fromValues(arr[0],arr[1],arr[2],arr[3]);
-    // var pos = vec4.create();
-    // pos = vec4.transformMat4(pos, vIn, invViewProjMat);
 
-    // pos[3] = 1.0 / pos[3];
-
-    // pos[0] *= pos[3];
-    // pos[1] *= pos[3];
-    // pos[2] *= pos[3];
-    // // console.log(mousePositionX);
-    // var finalPos = vec3.fromValues(pos[0],pos[1],pos[2]);
-    ps.addForce(finalPos);
+    if(controls.mode == 'attract'){
+      ps.attract(finalPos);
+    } else {
+      ps.repel(finalPos);
+    }
+    
 
 
   }
@@ -172,7 +159,7 @@ function main() {
   
 
   const renderer = new OpenGLRenderer(canvas);
-  renderer.setClearColor(0.2, 0.2, 0.2, 1);
+  renderer.setClearColor(0.0, 0.0, 0.0, 1);
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.ONE, gl.ONE); // Additive blending
 

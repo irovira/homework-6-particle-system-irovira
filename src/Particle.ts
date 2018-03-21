@@ -11,6 +11,7 @@ class Particle {
   addedForce: vec3 = vec3.create();
   mState: Array<number> = new Array<number>();
   mStateDot: Array<number> = new Array<number>();
+  center: vec3 = vec3.create();
 
   //velocity = mState[0,1,2];
   //acceleration = mState[3,4,5];
@@ -24,92 +25,14 @@ class Particle {
     this.pos = position;
     this.vel = vec3.fromValues(Math.floor(Math.random() * 5),Math.floor(Math.random() * 5),Math.floor(Math.random() * 5));
 	this.col = color;
+	this.center = vec3.fromValues(0,0,0);
 
-
-
-	//position
-	
-	// this.mState[0] = this.pos[0];
-	// this.mState[1] = this.pos[1];
-	// this.mState[2] = this.pos[2];
-
-	// //velocity
-	// this.mState[3] = 0.05 * (Math.random() * 2 - 1);//Math.random();
-	// this.mState[4] = 0.05 * (Math.random() * 2 - 1);//Math.random();
-	// this.mState[5] = (Math.random() * 2 - 1);//Math.random();
-
-	// //acceleration, which is zero for now
-	// this.mState[6] = 0.0;
-	// this.mState[7] = 0.0;
-	// this.mState[8] = 0.0;
-
-	// this.mState[9] = 1.0; //mass is 1 for now
-	// this.mState[10] = 1.0; //lifespan is 1 for now
-
-	// //velocity, mStateDot
-	// this.mStateDot[0] = this.vel[0];
-	// this.mStateDot[1] = this.vel[1];
-	// this.mStateDot[2] = this.vel[2];
-
-	// //acceleration, mStateDot
-	// this.mStateDot[3] = 0.0;
-	// this.mStateDot[4] = 0.0;
-	// this.mStateDot[5] = 0.0;
-
-	// this.maxVel = 40.0;
-
-	this.restoreRadius = Math.floor(Math.random() * 50);
+	this.restoreRadius = Math.floor(Math.random() * 10);
   }
   computeDynamics(deltaT:number){
-	//TODO: Add your code here
-	//velocity
-	// this.mState[3] = Math.cos(deltaT);
-	// this.mState[4] = Math.sin(deltaT);
-	// this.mState[5] = 0.0;
-	//velocity
-	// var jitter = Math.random();
-	// this.mStateDot[0] = this.mState[3];
-	// this.mStateDot[1] = this.mState[4];
-	// this.mStateDot[2] = this.mState[5];
-	
-	//acceleration
-	// this.mStateDot[3] = this.mState[6] / this.mState[9];
-	// this.mStateDot[4] = this.mState[7] / this.mState[9];
-	// this.mStateDot[5] = this.mState[8] / this.mState[9];
-	//forces
-
-	//var force = vec3.create();
-	//vec3.subtract(force, this.pos, vec3.fromValues(0,0,0));
-	//vec3.normalize(force,force);
-	
-
-
-	// var force = vec3.fromValues(0,0,0);//this.calculateForce();
-	// this.mState[6] = jitter * force[0] + this.addedForce[0];//jitter * -force[0] - this.addedForce[0];//0.0;//Math.random();//0.0;//force[0];//Math.cos(deltaT) / 10000000.0;//1.0;
-	// this.mState[7] = jitter * force[1] + this.addedForce[1];//jitter * -force[1] - this.addedForce[1];//0.0;//Math.random();//0.0;//force[1];//Math.sin(deltaT) / 10000000.0;
-	// this.mState[8] = jitter * force[2] + this.addedForce[2];//jitter * -force[2] - this.addedForce[2];//0.0;//Math.random();//0.0;//force[2];//0.0;
-	// if(this.addedForce[0] > 0.5){
-	// 	this.addedForce[0] -= 5.0
-	// } else {
-	// 	this.addedForce[0] = 0.0;
-	// }
-	// if(this.addedForce[1] > 0.5){
-	// 	this.addedForce[1] -= 5.0
-	// } else {
-	// 	this.addedForce[1] = 0.0;
-	// }
-	// if(this.addedForce[2] > 0.5){
-	// 	this.addedForce[2] -= 5.0
-	// } else {
-	// 	this.addedForce[2] = 0.0;
-	// }
-	//mass
-	//this.mStateDot[9] = 100.0;
-	//time to live
-	this.mStateDot[10] = 1.0;
   }
 
-  updateForce(position:vec3){
+  attract(position:vec3){
 	var force = vec3.create();
 	vec3.subtract(force, this.pos, position);
 	var r = vec3.length(force);
@@ -124,8 +47,25 @@ class Particle {
 	
   }
 
+  repel(position:vec3){
+	var force = vec3.create();
+	vec3.subtract(force, this.pos, position);
+	var r = vec3.length(force);
+	r *= r;
+	vec3.scale(force,force, 1/r);
+	this.addedForce = vec3.fromValues(0,0,0);
+	this.addedForce[0] += 1000.0*force[0];//500.0 - force[0];
+	this.addedForce[1] += 1000.0*force[1];//500.0 - force[1];
+	this.addedForce[2] += 1000.0*force[2];//500.0 - force[2];
+
+	//console.log('is now ' + this.addedForce);
+	
+  }
+
   restore(root:vec3){
 	this.addedForce = vec3.fromValues(0,0,0);
+	this.center = vec3.fromValues(0,0,0);
+	this.vel = vec3.fromValues(0,0,0);
 	//var force = vec3.create();
 	//vec3.subtract(force, this.pos, root);
 	//var r = vec3.length(force);
@@ -140,15 +80,22 @@ class Particle {
 	//this.addedForce = vec3.fromValues(0,0,0);
 	var force = vec3.create();
 	//this.addedForce = vec3.fromValues(0,0,0);
-	vec3.subtract(force, this.pos, vec3.fromValues(10,10,10));
+	vec3.subtract(force, this.pos, this.center);
 	var r = vec3.length(force);
-	if(r > this.restoreRadius){
-		return vec3.scale(force, force,-1);
-	} else if (r < this.restoreRadius - 1.0){
-		return vec3.scale(force, force,1);
+	var weh = Math.random();
+	// if(r > this.restoreRadius){
+	// 	return vec3.scale(force, force,-0.02);
+	// } else if (r < this.restoreRadius - 4.0){
+	// 	return vec3.scale(force, force,0.1);
+	// }
+	if(weh > 0.2 && r > this.restoreRadius){
+		return vec3.scale(force, force,-0.2);
+		
+	} else {
+		return vec3.scale(force, force,0.2);
 	}
 	//vec3.scale(force, force,-0.001);
-	return vec3.fromValues(0,0,0);//vec3.scale(force, force,0.0001);
+	//return vec3.fromValues(0,0,0);//vec3.scale(force, force,0.0001);
 	
 	//this.addedForce[0] = 50.0*force[0];//500.0 - force[0];
 	//this.addedForce[1] = 50.0*force[1];//500.0 - force[1];

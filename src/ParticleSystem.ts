@@ -45,19 +45,19 @@ class ParticleSystem {
     //update colors of particles
     for(let i = 0; i < this.particles.length; i++){
       let p: Particle = this.particles[i];
-      p.col = this.generateColor();
+      p.col = this.generateColor(p.pos);
     }
 
   }
  //palette generation based on triad mixing from 
  //http://devmag.org.za/2012/07/29/how-to-choose-colours-procedurally-algorithms/
 
- generateColor() : vec4 {
+ generateColor(pos:vec3) : vec4 {
   var randomIndex = Math.floor(Math.random() * 3);
-
-  var mixRatio1 = (randomIndex == 0) ? Math.random() * this.greyControl : Math.random();
-  var mixRatio2 = (randomIndex == 1) ? Math.random() * this.greyControl : Math.random();
-  var mixRatio3 = (randomIndex == 2) ? Math.random() * this.greyControl : Math.random();
+  var max = Math.max(pos[0], Math.max(pos[1], pos[2]));
+  var mixRatio1 = (randomIndex == 0) ? pos[0] / max * this.greyControl : Math.random();
+  var mixRatio2 = (randomIndex == 1) ? pos[1] / max * this.greyControl : Math.random();
+  var mixRatio3 = (randomIndex == 2) ? pos[2] / max * this.greyControl : Math.random();
 
   var sum = mixRatio1 + mixRatio2 + mixRatio3;
 
@@ -87,7 +87,7 @@ class ParticleSystem {
 
             var vel = vec3.fromValues(0,0,0);
   
-            var col = this.generateColor();//vec4.fromValues(i / this.maxParticles,j / this.maxParticles,1.0,1.0);
+            var col = this.generateColor(pos);//vec4.fromValues(i / this.maxParticles,j / this.maxParticles,1.0,1.0);
 
             let p : Particle = new Particle(pos, vel, col);
 
@@ -95,6 +95,34 @@ class ParticleSystem {
         }
     }
 
+  }
+
+  attractMesh(positions:Float32Array){
+    for(var i = 0; i < this.particles.length; i++){
+      //console.log(this.particles[i].pos);
+      var p = Math.floor(Math.random() * 4) * 3;
+      this.particles[i].pos =  vec3.fromValues(positions[p],positions[p+1], positions[p+2]);
+      //console.log(this.particles[i].pos);
+      this.particles[i].center =  vec3.fromValues(positions[p],positions[p+1], positions[p+2]);
+      this.particles[i].vel = vec3.fromValues(0,0,0);
+      //console.log(this.particles[i].pos);
+    }
+    // var offset = 0;
+    // var verts = positions.length / 3;
+    // for(var j = 0; j < positions.length; j = j + 3){
+    //   offset = (this.particles.length / verts) * j;
+    //   for(var i = 0; i < this.particles.length / verts; i++){
+    //     //console.log(this.particles[i].pos);
+    //     this.particles[i+offset].pos =  vec3.fromValues(positions[j],positions[j+1], positions[j+2]);
+    //     this.particles[i+offset].center =  vec3.fromValues(positions[j],positions[j+1], positions[j+2]);
+        
+    //     //console.log('called');
+    //     this.particles[i+offset].vel = vec3.fromValues(0,0,0);
+    //     //console.log(this.particles[i].pos);
+    //   }
+      
+    // }
+    
   }
 
   restore(){
@@ -128,11 +156,20 @@ class ParticleSystem {
 
   }
 
-  addForce(pos:vec3){
+  attract(pos:vec3){
     console.log(pos);
     for(var i = 0; i < this.particles.length; i++){
       //console.log(this.particles[i].pos);
-      this.particles[i].updateForce(pos);
+      this.particles[i].attract(pos);
+      //console.log(this.particles[i].pos);
+    }
+  }
+
+  repel(pos:vec3){
+    console.log(pos);
+    for(var i = 0; i < this.particles.length; i++){
+      //console.log(this.particles[i].pos);
+      this.particles[i].repel(pos);
       //console.log(this.particles[i].pos);
     }
   }
