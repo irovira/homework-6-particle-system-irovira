@@ -1,3 +1,29 @@
+# irovira || Isabela Rovira || Particle System
+## Particle Collection
+Particles are stored inside a ParticleCollection class, which is used to apply forces over the whole system. These can be found in Particle.ts and ParticleCollection.ts
+
+The Particle class uses Euler integration for movement.
+
+## Color Palette
+Color generation for particles is based on intial position along with the Triad-Based palette from [DevMag](http://devmag.org.za/2012/07/29/how-to-choose-colours-procedurally-algorithms/)
+
+## Interactive Forces (Extra Credit for multiple force points)
+The user can double click to apply a force depending on the mode (inside the menu). From the drop down menu, the user can choose to place an attractor or repeller. The attracting force and repelling force will remain in the scene.
+
+Forces can be reset by pressing the Restore center button on the menu.
+
+## Mesh Surface Interaction
+Users can pick two meshes to shape the particle system: the Stanford Bunny (the Bunny button) or Mario (the Wahoo! button).
+I used Three.js to read in obj files and passed the vertex information to my particle collection to create attractors on the surface of the mesh.
+
+The particles can still be modified once attached to a mesh.
+
+![](normal.png)
+
+![](bunny.png)
+
+![](wahoo.png)
+
 
 # Project 6: Particle System
 

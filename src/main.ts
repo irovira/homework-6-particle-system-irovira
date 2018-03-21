@@ -32,7 +32,7 @@ const controls = {
 
 let square: Square;
 let time: number = 0.0;
-let ps: ParticleSystem = new ParticleSystem(200.0, controls.color1, controls.color2, controls.color3, controls.greyControl, vec3.fromValues(0,0,0));
+let ps: ParticleSystem = new ParticleSystem(150.0, controls.color1, controls.color2, controls.color3, controls.greyControl, vec3.fromValues(0,0,0));
 var bunny: Bunny = new Bunny();
 function restoreCenter(){
   ps.restore();
